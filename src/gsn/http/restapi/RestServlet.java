@@ -161,6 +161,25 @@ public class RestServlet extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		StringBuilder sb = new StringBuilder();
+		BufferedReader br = request.getReader();
+    	
+    try {
+			String line;
+			while((line = br.readLine()) != null){
+				sb.append(line).append('\n');
+			}
+		} finally {
+			br.close();
+		}
+    	
+    try {
+			JSONObject jo = new JSONObject(sb.toString());
+			EventQueue.getInstance().addData(jo);
+		} catch (JSONException e) {
+			logger.error("error parsing json");
+		}
+
         response.getWriter().write("REST POST" + "\n" + request.getRequestURI());
     }
 
