@@ -30,15 +30,19 @@ package gsn.http.restapi;
 import gsn.Main;
 import gsn.http.ac.User;
 import gsn.http.ac.UserUtils;
+import gsn.http.rest.EventQueue;
 
 import java.io.IOException;
-
+import java.io.BufferedReader;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 public class RestServlet extends HttpServlet {
 
