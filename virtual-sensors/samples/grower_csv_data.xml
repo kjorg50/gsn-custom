@@ -1,0 +1,44 @@
+<virtual-sensor name="grower_csv_data" priority="10" publish-to-lsm="true">
+	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<output-structure>
+			<field name="SoilTensionR6B61" type="double" />
+			<field name="Battery12VoltsR10B3" type="double" />
+			<field name="SoilTensionR10B3" type="double" />
+			<field name="SignalstrengthDbR10B3" type="double" />
+			<field name="Battery12VoltsR6B6" type="double" />
+			<field name="SoilTensionR6B62" type="double" />
+			<field name="SoilTensionR6B63" type="double" />
+			<field name="SoilTensionR10B32" type="double" />
+			<field name="SoilTensionR10B33" type="double" />
+			<field name="SignalstrengthDbR6B6" type="double" />
+		</output-structure>
+	</processing-class>
+	<description>grower data</description>
+	<life-cycle pool-size="10"/>
+	<addressing>
+		<predicate key="geographical">grower sensor station</predicate>
+		<predicate key="LATITUDE">-30.0</predicate>
+		<predicate key="LONGITUDE">150.0</predicate>
+	</addressing>
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1000" storage-size="1">
+				<address wrapper="csv">
+					<predicate key="file">data/grower_data.csv</predicate>
+					<predicate key="fields">SoilTensionR6B61,Battery12VoltsR10B3,SoilTensionR10B3,SignalstrengthDbR10B3,Battery12VoltsR6B6,SoilTensionR6B62,SoilTensionR6B63,SoilTensionR10B32,SoilTensionR10B33,SignalstrengthDbR6B6</predicate>
+					<predicate key="formats">numeric, numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric</predicate>
+					<predicate key="bad-values">NaN,6999,-6999,null</predicate>
+					<predicate key="timezone">Etc/GMT-2</predicate>
+					<predicate key="sampling">500</predicate>
+					<predicate key="check-point-directory">csv-check-points</predicate>
+					<predicate key="separator">;</predicate>
+				</address>
+				<query>select * from wrapper
+				</query>
+			</source>
+			<query>select * from source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>
+
