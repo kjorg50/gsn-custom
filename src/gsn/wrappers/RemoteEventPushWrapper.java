@@ -81,54 +81,50 @@ public class RemoteEventPushWrapper extends AbstractWrapper{
 
 	public void run(){
 		JSONObject data = new JSONObject();
-		while(isActive()){
-            try{
-                Thread.sleep(samplingRate);            	
-            }catch (InterruptedException e){
-                logger.error(e.getMessage(), e);
-            }
-            
-            if(EventQueue.getInstance().isEmpty()){
-            	 logger.error("New data from the sensor is missing.");
-            }else{
-            	try {
-            		data = EventQueue.getInstance().removeData();
-                	StreamElement streamElement = jsonToStreamElemet(data);
-					// TODO change to debug
-                	logger.error("*** not an error *** data: " + data);
-                	logger.error("streamElement: " + streamElement.toString());
-                    postStreamElement(streamElement);
-				} catch (NoSuchElementException e) {
-					logger.error("EventQueue is empty.");
-				}            	
-            }            
-        }
-	}
+	  	while(isActive()){
+        	try{
+		 Thread.sleep(samplingRate);       		 
+        	}catch (InterruptedException e){
+            	 logger.error(e.getMessage(), e);
+        	}
+       	 
+        	if(EventQueue.getInstance().isEmpty()){
+       		 logger.error("New data from the sensor is missing.");
+        	}else{
+       		 try {
+       		  data = EventQueue.getInstance().removeData();
+		  StreamElement streamElement = jsonToStreamElemet(data);
+           	  logger.error("*** not an error *** data: " + data);
+           	  logger.error("streamElement: " + streamElement.toString());
+                  postStreamElement(streamElement);
+   		 } catch (NoSuchElementException e) {
+   		    logger.error("EventQueue is empty.");
+   		 } catch(JSONException je){
+   		    logger.error(je.getMessage());
+   		 }     		 
+        	}       	 
+    		}
+       } 
+    
+    private StreamElement jsonToStreamElemet(JSONObject jo) throws JSONException{
+   	 final String[] field_names;
+   	 final Byte[] field_bytes;
+   	 final Serializable[] field_values;
+   	 JSONArray fields = jo.getJSONArray("fields");
+   	 field_names = new String[fields.length()];
+   	 field_bytes = new Byte[fields.length()];
+   	 field_values = new Double[fields.length()];
+   	 for (int i = 0; i < fields.length(); i++) {
+   		 JSONObject field = fields.getJSONObject(i);
+   		 field_names[i] = field.get("name").toString();
+   		 field_bytes[i] = DataTypes.DOUBLE;
+   		 field_values[i] = Double.valueOf(field.get("value").toString());
+   	 }
 
-	private StreamElement jsonToStreamElemet(JSONObject jo) {
-		final String[] field_names; 
-		final Byte[] field_bytes;
-		final Serializable[] field_values;
-		try {
-			JSONArray fields = jo.getJSONArray("fields");
-			field_names = new String[fields.length()];
-			field_bytes = new Byte[fields.length()];
-			field_values = new Double[fields.length()];
-			for (int i = 0; i < fields.length(); i++){
-				JSONObject field = fields.getJSONObject(i);
-				field_names[i] = field.get("name").toString();
-				field_bytes[i] = DataTypes.DOUBLE;
-				field_values[i] = (Double)field.get("value");				
-			}
+   	 return new StreamElement(field_names, field_bytes, field_values,
+   			 System.currentTimeMillis());
 
-			return new StreamElement(field_names, field_bytes, field_values, System.currentTimeMillis());
-
-		} catch (JSONException e) {
-			logger.error("could not parse JSONObject " + jo.toString());
-			e.printStackTrace();
-			return null;
-		}
-	}
+    }
 
 	@Override
 	public void dispose() {
