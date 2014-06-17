@@ -89,7 +89,7 @@ public class RemoteEventPushWrapper extends AbstractWrapper{
         	}
        	 
         	if(EventQueue.getInstance().isEmpty()){
-       		 logger.error("New data from the sensor is missing.");
+       		 logger.debug("New data from the sensor is missing.");
         	}else{
        		 try {
        		  data = EventQueue.getInstance().removeData();
